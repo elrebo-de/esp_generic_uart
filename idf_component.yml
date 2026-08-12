@@ -1,5 +1,5 @@
 version: "1.0.1"
-license: "Apache 2.0"
+license: "Apache-2.0"
 description: "Generic UART component for ESP-IDF version 5.5.0+ using a C++ class"
 url: "https://elrebo.de/index.php/2026/08/13/generic_uart/"
 issues: "https://github.com/elrebo-de/generic_uart/issues"
