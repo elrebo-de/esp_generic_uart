@@ -7,8 +7,6 @@
 
 #include "generic_uart.hpp"
 #include "esp_log.h"
-#include "driver/uart.h"
-//#include "soc/clk_tree_defs.h"
 
 GenericUart::GenericUart( std::string tag,
                           uart_port_t uart_num,
@@ -23,6 +21,8 @@ GenericUart::GenericUart( std::string tag,
 
     ESP_LOGI(this->tag.c_str(), "constructor");
 
+    ESP_LOGI(this->tag.c_str(), "UART_HW_FIFO_LEN(%i): %i", uart_num, UART_HW_FIFO_LEN(uart_num));
+
     // Install UART driver using no event queue
     ESP_ERROR_CHECK(uart_driver_install(this->uart_num, this->uart_buffer_size, this->uart_buffer_size, 10, NULL /* war &this->uart_queue */, 0));
 
@@ -35,5 +35,18 @@ GenericUart::GenericUart( std::string tag,
 
 GenericUart::~GenericUart() {
 	// TODO Auto-generated destructor stub
+}
+
+uart_port_t GenericUart::getUartNum() {
+	return this->uart_num;
+}
+
+std::string GenericUart::readString(int timeoutMs) {
+    int len = uart_read_bytes(this->uart_num, this->data, 2048 - 1, timeoutMs / portTICK_PERIOD_MS);
+
+    data[len] = '\0';
+    std::string bytesRead((char *)data);
+
+	return bytesRead;
 }
 

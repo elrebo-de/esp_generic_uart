@@ -19,17 +19,27 @@
 
 class GenericUart {
 public:
-	GenericUart(std::string tag, uart_port_t uart_num, uart_config_t *uart_config, int uart_tx_pin, int uart_rx_pin);
+	GenericUart(
+	    std::string tag,
+	    uart_port_t uart_num,
+	    uart_config_t *uart_config,
+	    int uart_tx_pin,
+	    int uart_rx_pin
+	);
 	virtual ~GenericUart();
+	uart_port_t getUartNum();
+	std::string readString(int timeoutMs);
 
 private:
     std::string tag;
     uart_port_t uart_num;
-    int uart_buffer_size = (1024 * 2);
+    int uart_buffer_size = 2048;
     QueueHandle_t uart_queue;
     uart_config_t *uart_config;
     int uart_tx_pin;
     int uart_rx_pin;
+
+    uint8_t data[2048];
 };
 
 #endif /* GENERIC_UART_HPP_ */

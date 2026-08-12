@@ -13,51 +13,20 @@
 
 static const char *tag = "LC76G GNSS receiver";
 
-extern "C" void app_main(void)
+void gnssTask(void *pc)
 {
-    vTaskDelay(500 / portTICK_PERIOD_MS); // delay 0.5 seconds
-
-    ESP_LOGI(tag, "LC76G GNSS receiver Example Program");
-
-    // set UART configuration
-    const uart_port_t uart_num = UART_NUM_2;
-    uart_config_t uart_config = {
-        .baud_rate = 115200,
-        .data_bits = UART_DATA_8_BITS,
-        .parity = UART_PARITY_DISABLE,
-        .stop_bits = UART_STOP_BITS_1,
-        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
-        .rx_flow_ctrl_thresh = 0,
-        .source_clk = UART_SCLK_DEFAULT,
-        .flags = {
-           .allow_pd = 0,
-           .backup_before_sleep = 0,
-        },
-    };
-    const int uart_tx_pin = 26;
-    const int uart_rx_pin = 32;
-
-    GenericUart gnssUart(
-                 "LC76G GNSS UART",
-                 uart_num,
-                 &uart_config,
-                 uart_tx_pin,
-                 uart_rx_pin);
-
-    ESP_LOGI(tag, "wait for GNSS messages");
-
-    uint8_t* data = (uint8_t*) malloc(2048);
+    // get gnssUart pointer
+    GenericUart *gnssUart = (GenericUart *) pc;
 
     while (1) {
-        // reads data from UART with a timeout 0f 100 ms
-        int len = uart_read_bytes(uart_num, data, 2048 - 1, 100 / portTICK_PERIOD_MS);
+        // reads data (max. 2048 - 1 bytes) from UART with a timeout 0f 100 ms
+        // int len = uart_read_bytes(*uart_num, data, 2048 - 1, 100 / portTICK_PERIOD_MS);
+        //int len = uart_read_bytes(gnssUart->getUartNum(), data, 2048 - 1, 100 / portTICK_PERIOD_MS);
 
         // every second the LC76G sends data (less than 2k)
-        if (len > 0) {
-            data[len] = '\0';
+        std::string allMessages = gnssUart->readString(100);
 
-            std::string allMessages((char *)data);
-
+        if (allMessages.length() > 0) {
             // parse message $GNVTG
             std::size_t position = allMessages.find("$GNVTG");
             if(position != std::string::npos) {
@@ -156,5 +125,50 @@ extern "C" void app_main(void)
             }
         }
     }
-    free(data);
+}
+
+extern "C" void app_main(void)
+{
+    vTaskDelay(500 / portTICK_PERIOD_MS); // delay 0.5 seconds
+
+    ESP_LOGI(tag, "LC76G GNSS receiver Example Program");
+
+    // set UART configuration
+    const uart_port_t uart_num = UART_NUM_2;
+
+    uart_config_t uart_config = {
+        .baud_rate = 115200,
+        .data_bits = UART_DATA_8_BITS,
+        .parity = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .rx_flow_ctrl_thresh = 0,
+        .source_clk = UART_SCLK_DEFAULT,
+        .flags = {
+           .allow_pd = 0,
+           .backup_before_sleep = 0,
+        },
+    };
+    // M5STACK CORE2 V1.1
+    const int uart_tx_pin = 32;
+    const int uart_rx_pin = 33;
+
+    // M5ATOM LITE
+    // const int uart_tx_pin = 26;
+    // const int uart_rx_pin = 32;
+
+    GenericUart gnssUart(
+                 "LC76G GNSS UART",
+                 uart_num,
+                 &uart_config,
+                 uart_tx_pin,
+                 uart_rx_pin);
+
+    ESP_LOGI(tag, "create Task to wait for GNSS messages");
+    xTaskCreate(gnssTask, "gnssTask", 4096, (void *) &gnssUart, 5, NULL);
+
+    // do nothing
+    while(1) {
+        vTaskDelay(30000 / portTICK_PERIOD_MS); // delay 30 seconds
+    }
 }
