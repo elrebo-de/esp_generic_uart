@@ -1,6 +1,6 @@
 # GenericUart component
 
-This repository contains an ESP-IDF component for a UART. It runs on
+This repository contains an ESP-IDF component for UART communications. It runs on
 any ESP32 processor and is built using the ESP-IDF build system in version 5.5.0+.
 
 The component is implemented as C++ class `GenericUart`.
@@ -9,7 +9,9 @@ The component is implemented as C++ class `GenericUart`.
 
 You need to include ```generic_uart.hpp```.
 
-In your program you have to set the configuration for the UART and create an instance of clas `GenericUart`.
+In your program you have to set the configuration for the UART and create an instance of class `GenericUart`.
+
+This snippet shows how to use the GenericUart class to read the NMEA records from a GNSS positioning system. See example gnss_example for details.
 
 ```C++
 extern "C" void app_main(void)
@@ -57,7 +59,9 @@ extern "C" void app_main(void)
 
 Currently class `GenericUart` only supports reading data with method `readString`. The string size is limited to 2047 bytes.
 
-((tbc))
+
+
+The components is tested on ESP-IDF version 5.5.5 and version 6.0.
 
 # License
 
