@@ -8,6 +8,8 @@
 #include "generic_uart.hpp"
 #include "esp_log.h"
 
+#include "esp_idf_version.h"
+
 GenericUart::GenericUart( std::string tag,
                           uart_port_t uart_num,
                           uart_config_t *uart_config,
@@ -30,7 +32,11 @@ GenericUart::GenericUart( std::string tag,
     ESP_ERROR_CHECK(uart_param_config(this->uart_num, this->uart_config));
 
     // Set UART pins(TX, RX, RTS, CTS, DTR, DSR)
-    ESP_ERROR_CHECK(uart_set_pin(this->uart_num, this->uart_tx_pin, this->uart_rx_pin, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+    #if ESP_IDF_VERSION_MAJOR == 6
+        ESP_ERROR_CHECK(uart_set_pin(this->uart_num, this->uart_tx_pin, this->uart_rx_pin, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+    #elif ESP_IDF_VERSION_MAJOR < 6
+        ESP_ERROR_CHECK(uart_set_pin(this->uart_num, this->uart_tx_pin, this->uart_rx_pin, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+    #endif
 }
 
 GenericUart::~GenericUart() {
