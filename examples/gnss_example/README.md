@@ -1,6 +1,6 @@
 # gnss_example
 
-This example uses the generic_uart component to connect to a LC76G GNSS system via UART to read the NMEA records `$GNVTG`, `$GNRMC` and `$GNGAA` every second.
+This example uses the generic_uart component to connect to a LC76G GNSS system via UART to read the NMEA records `$GNVTG`, `$GNRMC` and `$GNGGA` every second.
 
 The LC76G GNSS system used is a Waveshare LC76G GNSS Module. I have connected VCC, GND, TX and RX lines to the Grove Port of my ESP32 SoC:
 
@@ -15,7 +15,7 @@ AFter some seconds (up to 15 sec.) the PPS LED on the GNSS module is flashing on
 
 The String read contains all the different NMEA messages, the GNSS module sends out.
 
-From these messages the `$GNVTG`, `$GNRMC` and `$GNGAA` messages are interpreted and written to the log every second.
+From these messages the `$GNVTG`, `$GNRMC` and `$GNGGA` messages are interpreted and written to the log every second.
 
 ``` log
 I (10215) LC76G GNSS receiver: $GNVTG
