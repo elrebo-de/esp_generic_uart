@@ -11,6 +11,8 @@
 #include "generic_uart.hpp"
 #include "esp_log.h"
 
+#include "esp_idf_version.h"
+
 static const char *tag = "LC76G GNSS receiver";
 
 void gnssTask(void *pc)
@@ -135,6 +137,7 @@ extern "C" void app_main(void)
 
     // set UART configuration
     const uart_port_t uart_num = UART_NUM_2;
+    uint32_t uart_buffer_size = 2048;
 
     uart_config_t uart_config = {
         .baud_rate = 115200,
@@ -143,6 +146,9 @@ extern "C" void app_main(void)
         .stop_bits = UART_STOP_BITS_1,
         .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
         .rx_flow_ctrl_thresh = 0,
+#if ESP_IDF_VERSION_MAJOR == 6
+        .rx_glitch_filt_thresh = 0,
+#endif
         .source_clk = UART_SCLK_DEFAULT,
         .flags = {
            .allow_pd = 0,
@@ -162,7 +168,9 @@ extern "C" void app_main(void)
                  uart_num,
                  &uart_config,
                  uart_tx_pin,
-                 uart_rx_pin);
+                 uart_rx_pin,
+                 uart_buffer_size,
+                 NULL);
 
     ESP_LOGI(tag, "create Task to wait for GNSS messages");
     xTaskCreate(gnssTask, "gnssTask", 4096, (void *) &gnssUart, 5, NULL);

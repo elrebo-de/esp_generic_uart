@@ -1,6 +1,6 @@
 idf_component_register(SRCS "generic_uart.cpp"
                     INCLUDE_DIRS "include"
-                    REQUIRES "driver"
-                             "esp_driver_uart"
+                    REQUIRES "esp_driver_uart"
+                    PRIV_REQUIRES "esp_driver_gpio"
                     )
 

@@ -24,22 +24,33 @@ public:
 	    uart_port_t uart_num,
 	    uart_config_t *uart_config,
 	    int uart_tx_pin,
-	    int uart_rx_pin
+	    int uart_rx_pin,
+        uint32_t uart_buffer_size,
+        TaskFunction_t rx_task
 	);
 	virtual ~GenericUart();
 	uart_port_t getUartNum();
-	std::string readString(int timeoutMs);
+	QueueHandle_t getUartQueue();
+	uint32_t getUartBufferSize();
+	std::string getTag();
 
+	std::string readString(int timeoutMs);
+    esp_err_t writeString(std::string command);
 private:
     std::string tag;
     uart_port_t uart_num;
-    int uart_buffer_size = 2048;
+    uint32_t uart_buffer_size;
     QueueHandle_t uart_queue;
     uart_config_t *uart_config;
     int uart_tx_pin;
     int uart_rx_pin;
+    TaskFunction_t rx_task;
 
-    uint8_t data[2048];
+    TaskHandle_t rx_task_handle;
+
+    bool uart_initialized;
+
+    uint8_t* data;
 };
 
 #endif /* GENERIC_UART_HPP_ */

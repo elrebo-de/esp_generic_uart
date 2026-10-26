@@ -11,11 +11,15 @@ The LC76G GNSS system used is a Waveshare LC76G GNSS Module. I have connected VC
 | TX                | G33 (RX)   |
 | RX                | G32 (TX)   |
 
-AFter some seconds (up to 15 sec.) the PPS LED on the GNSS module is flashing once per minute and the data can be read with method `GenericUart::ReadString`.  
+After some seconds (up to 15 sec.) the PPS LED on the GNSS module is flashing once per minute and the data can be read with method `GenericUart::readString`.  
 
 The String read contains all the different NMEA messages, the GNSS module sends out.
 
 From these messages the `$GNVTG`, `$GNRMC` and `$GNGGA` messages are interpreted and written to the log every second.
+
+This is an early example program, which uses class `GenericUart` without event queue and establishes a tasks which repeatedly calls the `readString` method.
+
+Example uart_with_event_queue shows a better solution to listen for received data from a UART. 
 
 ``` log
 I (10215) LC76G GNSS receiver: $GNVTG
